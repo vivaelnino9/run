@@ -1,24 +1,30 @@
 import curses
 
 from game.game import Game
+from ui.ui import Ui
 
 sc = curses.initscr()
+
+uiState = -1
+uiError = ''  # might use later
 
 HEIGHT, WIDTH = 30, 100
 
 while True:
+    ui = Ui(uiState, uiError)
+    uiState = ui.state
 
-    windowSize = sc.getmaxyx()
-
-    if windowSize[0] < HEIGHT or windowSize[1] < WIDTH:
-        # Add warning here
-        break
-
-    else:
+    if uiState == 0:
         game = Game(HEIGHT, WIDTH)
         game.connect()
         game.start()
-        break
+    elif uiState == 2:
+        # Controls
+        pass
+    else:
+        # Exit
+        pass
+    break
 
 
 sc.refresh()

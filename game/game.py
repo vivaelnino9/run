@@ -28,14 +28,13 @@ class Game:
         position = self.width - 3
         while True:
             try:
+                self.draw(position)
                 key = self.window.getch()
 
                 if key == curses.KEY_UP:
                     self.player.jump()
                 elif key == curses.KEY_DOWN:
                     self.player.lower()
-
-                self.draw(position)
 
                 # temp rock behavior
                 position -= 2
