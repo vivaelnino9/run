@@ -2,33 +2,56 @@ import curses, random
 
 
 class Background:
-    def __init__(self, window, rgb):
+    def __init__(self, window, rgb, text_color=curses.COLOR_WHITE):
         self.window = window
         self.height, self.width = self.window.getmaxyx()
-        self.rgb = rgb
 
-    #  TODO INITIATE COLORS FIRST
-    def draw(self, color=curses.COLOR_WHITE):
-        if self.rgb:
-            i = self.rgb[3]  # multiplier for color/pair identification. All colors and pairs need different ids
-            for y in range(self.height):
-                curses.init_color(y+i, self.rgb[0] + (y*5), self.rgb[1] + (y*5), self.rgb[2])
-                curses.init_pair(y+i, color, y+i)
-                for x in range(99):
-                    self.window.addstr(y, x, ' ', curses.color_pair(y+i))
+        self.rgb = rgb
+        self.id_start = self.rgb[3]
+        self.text_color = text_color
+
+        self.initiate_colors()
+
+    """
+    Parameters: 
+        window (curses.window): Window in which background is operating
+        rgb (list): List of rgb values with fourth value being the start of the color id range
+        text_color (int): Number of color id for text color, default white
+    
+    Color Pair IDs (color pair: foreground/text and background color)
+    ----------------
+    Sky: 50 - 59
+    Water: 100 - 113
+    Beach: 200 - 205
+    ----------------
+    """
+
+    def initiate_colors(self):
+        # for each line initiate the color and pair for that line
+        for y in range(self.height):
+            color_id = self.id_start + y
+            # For gradient effect, for each line increment green and blue values by 5
+            curses.init_color(color_id, self.rgb[0] + (y * 5), self.rgb[1] + (y * 5), self.rgb[2])
+            curses.init_pair(color_id, self.text_color, color_id)
+
+    def draw(self):
+        # for each line and column draw an empty string with the initiated color pair for that line
+        for y in range(self.height):
+            for x in range(99):
+                self.window.addstr(y, x, ' ', curses.color_pair(self.get_color(y)))
 
     def get_color(self, y):
-        return y + self.rgb[3]
+        # based on id start and current y position, return the color pair for that line
+        return self.id_start + y
 
 
 class Sky(Background):
     def __init__(self, window):
         Background.__init__(self, window, [0, 0, 0, 50])
         self.height, self.width = self.window.getmaxyx()  # 10, 100
-        self.mountains = []
-        self.clouds = []
         self.stars = []
 
+        # generate first stars
         for i in range(20):
             self.add_star(random.randrange(1, self.width - 2))
 
@@ -36,11 +59,15 @@ class Sky(Background):
         super(Sky, self).draw()
         self.draw_stars()
 
-    def add_star(self, x=98):
+    def add_star(self, x=None):
+        # create star object with coordinates y and x, if x not provided start it at the far right side of screen
+        if x is None:
+            x = self.width - 2
         y = random.randrange(1, self.height - 1)
-        self.stars.append(Star(self.window, y, x))
+        self.stars.append(Star(self, y, x))
 
     def draw_stars(self):
+        # draw each star and move it left, if star reaches far left of screen remove it and add another.
         for s in self.stars:
             if s.x < 2:
                 self.stars.remove(s)
@@ -63,12 +90,13 @@ class Beach(Background):
 
 
 class Star:
-    def __init__(self, window, y, x):
-        self.window = window
-        self.y, self.x = y, x
+    def __init__(self, sky, y, x):
+        self.sky = sky
+        self.y = y
+        self.x = x
 
     def draw(self):
-        self.window.addstr(self.y, self.x, "*")
+        self.sky.window.addstr(self.y, self.x, "*", curses.color_pair(self.sky.get_color(self.y)))
 
     def move(self):
         self.x -= 1
