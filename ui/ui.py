@@ -28,6 +28,7 @@ class Ui:
         # TODO Exit State (Message for exiting)
 
     def draw_background(self):
+        # TODO MOVE THIS TO MAIN.PY
         curses.start_color()
         curses.use_default_colors()
 
