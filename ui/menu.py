@@ -23,6 +23,10 @@ class Menu:
         self.create_menu()
 
     def create_menu(self):
+        # initiate menu colors
+        curses.init_color(30, 400, 0, 0)
+        curses.init_pair(30, 30, curses.COLOR_BLACK)
+
         while True:
             key = self.w.getch()
 
@@ -59,12 +63,11 @@ class Menu:
 
     def draw(self):
         self.w.erase()
-        self.w.bkgd(' ', curses.color_pair(125) | curses.A_BOLD)
+        self.w.bkgd(' ', curses.color_pair(30) | curses.A_BOLD)
 
         for index in range(0, len(self.menu)):
             checked = '>' if index == self.selection else ' '  # arrow next to highlighted selection
-            self.w.addstr(1 + index, 5, f'{checked} {self.menu[index]["Label"]}', curses.color_pair(125) |
-                          curses.A_BLINK)
+            self.w.addstr(1 + index, 5, f'{checked} {self.menu[index]["Label"]}', curses.color_pair(30))
 
     def select(self):
         label = self.menu[self.selection]['Label']

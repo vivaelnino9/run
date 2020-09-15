@@ -4,6 +4,9 @@ from ui.ui import Ui
 
 
 def main(stdscr):
+    curses.start_color()
+    curses.use_default_colors()
+
     ui = Ui(-1, '')
     ui_state = ui.state
 
