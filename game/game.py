@@ -34,6 +34,7 @@ class Game:
         while True:
             try:
                 self.draw(position)
+                self.window.refresh()
                 key = self.window.getch()
 
                 if key == curses.KEY_UP:
