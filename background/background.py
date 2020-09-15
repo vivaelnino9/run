@@ -1,92 +1,74 @@
-import curses, math, random
+import curses, random
 
 
 class Background:
-    def __init__(self, window):
+    def __init__(self, window, rgb):
         self.window = window
         self.height, self.width = self.window.getmaxyx()
-        self.ground = self.height - 20
+        self.rgb = rgb
+
+    #  TODO INITIATE COLORS FIRST
+    def draw(self, color=curses.COLOR_WHITE):
+        if self.rgb:
+            i = self.rgb[3]  # multiplier for color/pair identification. All colors and pairs need different ids
+            for y in range(self.height):
+                curses.init_color(y+i, self.rgb[0] + (y*5), self.rgb[1] + (y*5), self.rgb[2])
+                curses.init_pair(y+i, color, y+i)
+                for x in range(99):
+                    self.window.addstr(y, x, ' ', curses.color_pair(y+i))
+
+    def get_color(self, y):
+        return y + self.rgb[3]
+
+
+class Sky(Background):
+    def __init__(self, window):
+        Background.__init__(self, window, [0, 0, 0, 50])
+        self.height, self.width = self.window.getmaxyx()  # 10, 100
         self.mountains = []
         self.clouds = []
         self.stars = []
 
-        def get_clouds():
-            for i in range(10):
-                y, x = random.randrange(1, self.ground - 6), random.randrange(1, self.width - 15)
-                self.clouds.append((y, x))
+        for i in range(20):
+            self.add_star(random.randrange(1, self.width - 2))
 
-        get_clouds()
+    def draw(self, color=curses.COLOR_WHITE):
+        super(Sky, self).draw()
+        self.draw_stars()
 
-    def draw(self):
-        # draw ground
-        self.window.hline(self.ground, 1, '.', self.width - 2)
-        # draw clouds
-        self.draw_clouds()
-        # draw mountains
-        self.draw_mountains()
+    def add_star(self, x=98):
+        y = random.randrange(1, self.height - 1)
+        self.stars.append(Star(self.window, y, x))
 
     def draw_stars(self):
         for s in self.stars:
-            self.window.addstr(s[0], s[1], "*")
+            if s.x < 2:
+                self.stars.remove(s)
 
-    def draw_clouds(self):
-        for c in self.clouds:
-            self.window.addstr(c[0], c[1], "    .,     ")
-            self.window.addstr(c[0]+1, c[1], ";';'  ';'. ")
-            self.window.addstr(c[0]+2, c[1], "';.,;    ,;")
-            self.window.addstr(c[0]+3, c[1], "   '.';.'")
-
-    def draw_mountains(self):
-        if random.random() < .18:
-            start, length = self.width - 1, random.randrange(1, 12, 2)
-            new_mountain = Mountain(self.window, start, start + length, self.ground)
-            self.mountains.append(new_mountain)
-
-        for m in self.mountains:
-            if m.end < 0:
-                del m
             else:
-                m.draw()
-                m.move()
+                s.draw()
+                s.move()
+        if len(self.stars) < 20:
+            self.add_star()
 
 
-class Mountain():
-    def __init__(self, window, start, end, base):
-        self.start = start
-        self.end = end
-        self.base = base
+class Water(Background):
+    def __init__(self, window):
+        Background.__init__(self, window, [10, 10, 115, 100])
+
+
+class Beach(Background):
+    def __init__(self, window):
+        Background.__init__(self, window, [210, 180, 140, 200])
+
+
+class Star:
+    def __init__(self, window, y, x):
         self.window = window
+        self.y, self.x = y, x
 
     def draw(self):
-        height, width = self.window.getmaxyx()
-        mountain = gen_mountain(self.start, self.end, self.base)
-        for i in mountain:
-            if 0 < i[0] < height and 0 < i[1] < width:
-                self.window.addch(i[0], i[1], i[2])
+        self.window.addstr(self.y, self.x, "*")
 
     def move(self):
-        self.start -= 1
-        self.end -= 1
-
-
-# TODO TRY TO SEE IF YOU CAN ADD CLOUDS
-# class Cloud():
-
-
-def gen_mountain(start, end, base_height):
-    slope = math.ceil((end - start) / 2)
-
-    y_list = list(range(base_height, base_height - slope, -1)) + list(range(base_height - slope + 1, base_height + 1))
-    x_list = range(start, end+1)
-    symbols = ['/'] * slope + ['\\'] * slope
-
-    return list(zip(y_list, x_list, symbols))
-
-
-# PYRAMID
-# y, x = 22, 88
-#
-# for i in range(20):
-#     uly, ulx = y + i, x - (i*2)
-#     lry, lrx = (y+1) + i, (x+2) + (i*2)
-#     pad.rectangle(win, uly, ulx, lry, lrx)
+        self.x -= 1
