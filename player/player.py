@@ -1,8 +1,15 @@
+import curses
+
+
 class Player:
-    def __init__(self, window, y, x):
-        self.window = window
-        self.y = self.grounded_height = y
-        self.x = x
+    def __init__(self, water):
+        # TODO ADD SHADOW OF PLAYER ON BEACH. MAYBE THAT GOES HERE MAYBE NOT.
+        self.water = water
+        self.water_window = self.water.window
+        self.water_height, self.water_width = self.water_window.getmaxyx()
+        self.y = self.grounded_height = self.water_height-2
+        self.x = 9
+
         self.phase = 2
         self.is_jumping = False
         self.double_jump_avail = True
@@ -33,36 +40,37 @@ class Player:
                 self.moving_down = True
                 self.moving_up = False
 
-        # TODO drawing can be done better here, maybe in a different place? Its own function?
+        # TODO DRAWING CAN BE DONE BETTER HERE, MAYBE IN A DIFFERENT PLACE? ITS OWN FUNCTION?
+        # TODO NOW WITH COLORS BEING SPECIFIED THI REALLY NEEDS TO BE CLEANED UP
 
         # head
-        self.window.addch(self.y - 1, self.x, 'O')
+        self.water_window.addstr(self.y - 1, self.x, 'O', curses.color_pair(self.water.get_color(self.y-1)))
 
         # torso
-        self.window.addch(self.y, self.x, 'Ÿ')
+        self.water_window.addstr(self.y, self.x, 'Ÿ', curses.color_pair(self.water.get_color(self.y)))
 
         if self.is_jumping:
             # left arm
-            self.window.addch(self.y - 1, self.x - 1, "\\")
+            self.water_window.addstr(self.y - 1, self.x - 1, "\\", curses.color_pair(self.water.get_color(self.y-1)))
             # right arm
-            self.window.addch(self.y - 1, self.x + 1, "/")
+            self.water_window.addstr(self.y - 1, self.x + 1, "/", curses.color_pair(self.water.get_color(self.y-1)))
         else:
             # left arm
-            self.window.addch(self.y, self.x - 1, "/")
+            self.water_window.addstr(self.y, self.x - 1, "/", curses.color_pair(self.water.get_color(self.y)))
             # right arm
-            self.window.addch(self.y, self.x + 1, "\\")
+            self.water_window.addstr(self.y, self.x + 1, "\\", curses.color_pair(self.water.get_color(self.y)))
 
         if self.phase == 1:
             # left leg
-            self.window.addch(self.y + 1, self.x - 1, '/')
+            self.water_window.addstr(self.y + 1, self.x - 1, '/', curses.color_pair(self.water.get_color(self.y+1)))
             # right leg
-            self.window.addch(self.y + 1, self.x + 1, "\\")
+            self.water_window.addstr(self.y + 1, self.x + 1, "\\", curses.color_pair(self.water.get_color(self.y+1)))
         elif self.phase == 2:
             # single leg
-            self.window.addch(self.y + 1, self.x, '|')
+            self.water_window.addstr(self.y + 1, self.x, '|', curses.color_pair(self.water.get_color(self.y+1)))
         else:
             # left leg
-            self.window.addch(self.y, self.x - 1, '/')
+            self.water_window.addstr(self.y, self.x - 1, '/', curses.color_pair(self.water.get_color(self.y)))
 
         if self.phase < 3:
             self.phase += 1
@@ -76,6 +84,14 @@ class Player:
     def is_max_height(self):
         """Checks if player is at maximum height (where background starts)"""
         return self.y == self.grounded_height - 8
+
+    def move_forwards(self):
+        if self.x < self.water_width - 4:
+            self.x += 3
+
+    def move_backwards(self):
+        if self.x > 4:
+            self.x -= 3
 
     def jump(self):
         """Puts the player in the jumping phase if it isn't but not when double jump isn't available"""
