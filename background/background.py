@@ -2,12 +2,12 @@ import curses, random
 
 
 class Background:
-    def __init__(self, window, rgb, text_color=curses.COLOR_WHITE):
+    def __init__(self, window, rgb, id_start, text_color=curses.COLOR_WHITE):
         self.window = window
         self.height, self.width = self.window.getmaxyx()
 
         self.rgb = rgb
-        self.id_start = self.rgb[3]
+        self.id_start = id_start
         self.text_color = text_color
 
         self.initiate_colors()
@@ -15,7 +15,8 @@ class Background:
     """
     Parameters: 
         window (curses.window): Window in which background is operating
-        rgb (list): List of rgb values with fourth value being the start of the color id range
+        rgb (list): List of rgb values
+        id_start (int): Number for start of color and color pair ids (below)
         text_color (int): Number of color id for text color, default white
     
     Color Pair IDs (color pair: foreground/text and background color)
@@ -30,9 +31,13 @@ class Background:
         # for each line initiate the color and pair for that line
         for y in range(self.height):
             color_id = self.id_start + y
-            # For gradient effect, for each line increment green and blue values by 5
-            curses.init_color(color_id, self.rgb[0] + (y * 5), self.rgb[1] + (y * 5), self.rgb[2])
+            curses.init_color(color_id, self.rgb[0], self.rgb[1], self.rgb[2])
             curses.init_pair(color_id, self.text_color, color_id)
+            # For gradient effect, for each line decrement green and blue values by 4
+            if self.rgb[0] > 4:
+                self.rgb[0] -= 4
+            if self.rgb[1] > 4:
+                self.rgb[1] -= 4
 
     def draw(self):
         # for each line and column draw an empty string with the initiated color pair for that line
@@ -47,7 +52,7 @@ class Background:
 
 class Sky(Background):
     def __init__(self, window):
-        Background.__init__(self, window, [0, 0, 0, 50])
+        Background.__init__(self, window, [40, 40, 40], 50)
         self.height, self.width = self.window.getmaxyx()  # 10, 100
         self.stars = []
 
@@ -81,12 +86,12 @@ class Sky(Background):
 
 class Water(Background):
     def __init__(self, window):
-        Background.__init__(self, window, [10, 10, 115, 100])
+        Background.__init__(self, window, [75, 75, 130], 100)
 
 
 class Beach(Background):
     def __init__(self, window):
-        Background.__init__(self, window, [210, 180, 140, 200])
+        Background.__init__(self, window, [240, 200, 160], 200)
 
 
 class Star:
