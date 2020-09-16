@@ -4,15 +4,17 @@ from ui.menu import Menu
 
 
 class Ui:
-    def __init__(self, state, error):
+    def __init__(self, state, error, height, width):
         self.state = state  # 0: start, 2: controls, 4: exit
         self.error = error
+        self.height = height
+        self.width = width
 
         self.s = curses.initscr()
         curses.curs_set(0)
         curses.noecho()
 
-        self.w = curses.newwin(30, 100, 0, 0)
+        self.w = curses.newwin(self.height, self.width, 0, 0)
         self.w.timeout(0)
 
         if self.state == -1:

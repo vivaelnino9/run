@@ -7,14 +7,18 @@ from player.player import Player
 
 
 class Game:
-    def __init__(self):
-        self.height = 30
-        self.width = 100
+    def __init__(self, height, width):
+        self.height = height
+        self.width = width
         self.window = curses.newwin(self.height, self.width, 0, 0)
 
-        self.sky = Sky(self.window.subwin(10, self.width, 0, 0))  # 0 - 10
-        self.water = Water(self.window.subwin(14, self.width, 10, 0))  # 10 - 24
-        self.beach = Beach(self.window.subwin(6, self.width, 24, 0))  # 24 - 30
+        self.sky_height = self.height // 3
+        self.water_height = self.height // 2
+        self.beach_height = self.height // 6
+
+        self.sky = Sky(self.window.subwin(self.sky_height, self.width, 0, 0))
+        self.water = Water(self.window.subwin(self.water_height, self.width, self.sky_height, 0))
+        self.beach = Beach(self.window.subwin(self.beach_height, self.width, self.sky_height+self.water_height, 0))
 
         self.player = Player(self.water)
         # self.score = 0
@@ -82,6 +86,6 @@ class Game:
             # win.addstr(lry, ulx, '└', curses.color_pair(5))
 
         if position > 0:
-            rectangle(self.water, 10, position, 14, position + 4)
+            rectangle(self.water, 10, position, self.water_height, position + 4)
 
 

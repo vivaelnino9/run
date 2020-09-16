@@ -42,7 +42,7 @@ class Background:
     def draw(self):
         # for each line and column draw an empty string with the initiated color pair for that line
         for y in range(self.height):
-            for x in range(99):
+            for x in range(self.width-1):
                 self.window.addstr(y, x, ' ', curses.color_pair(self.get_color(y)))
 
     def get_color(self, y):

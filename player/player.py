@@ -83,7 +83,7 @@ class Player:
 
     def is_max_height(self):
         """Checks if player is at maximum height (where background starts)"""
-        return self.y == self.grounded_height - 10
+        return self.y == 2
 
     def move_forwards(self):
         if self.x < self.water_width - 4:
