@@ -12,8 +12,8 @@ class Game:
         self.width = width
         self.window = curses.newwin(self.height, self.width, 0, 0)
 
-        self.sky_height = self.height // 3
-        self.water_height = self.height // 2
+        self.sky_height = round(self.height // 2.7)
+        self.water_height = round(self.height // 2.1)
         self.beach_height = self.height // 6
 
         self.sky = Sky(self.window.subwin(self.sky_height, self.width, 0, 0))
