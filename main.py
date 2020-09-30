@@ -14,7 +14,8 @@ def main(stdscr):
     ui_state = ui.state
 
     if ui_state == 0:
-        game = Game(HEIGHT, WIDTH)
+        # medium difficult
+        game = Game(HEIGHT, WIDTH, 'easy')
         game.start()
 
 
