@@ -65,8 +65,10 @@ class Sky(Background):
 
         # Boat Main Color
         curses.init_color(61, 131, 86, 41)
-        # Boat Flag Colo
+        # Boat Flag Color
         curses.init_color(71, 255, 50, 50)
+        # Random Star Color
+        curses.init_color(81, 250, 250, 0)
 
     def draw(self):
         super(Sky, self).draw()
@@ -156,8 +158,18 @@ class Star:
         self.y = y
         self.x = x
 
+        self.color = self.sky.get_color(self.y)
+
+        def initiate_color():
+            # choose at random stars to be yellow instead of default white
+            if random.randrange(0, 100) < 15:
+                curses.init_pair(81 + self.y, 81, self.color)
+                self.color = 81 + self.y
+
+        initiate_color()
+
     def draw(self):
-        self.sky.window.addstr(self.y, self.x, "*", curses.color_pair(self.sky.get_color(self.y)))
+        self.sky.window.addstr(self.y, self.x, "*", curses.color_pair(self.color))
 
     def move(self):
         self.x -= 1
