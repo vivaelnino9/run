@@ -1,7 +1,7 @@
 import curses
-from game.game import Game
 from ui.ui import Ui
 
+# IN THE FUTURE THIS COULD BE AN OPTIONAL INPUT?
 HEIGHT = 30
 WIDTH = 100
 
@@ -11,13 +11,7 @@ def main(stdscr):
     curses.use_default_colors()
 
     ui = Ui(-1, '', HEIGHT, WIDTH)
-    ui_state = ui.state
-
-    if ui_state == 0:
-        # medium difficult
-        game = Game(HEIGHT, WIDTH, 'easy')
-        game.start()
+    ui.run()
 
 
 curses.wrapper(main)
-

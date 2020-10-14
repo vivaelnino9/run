@@ -17,7 +17,7 @@ class Game:
         self.water = Water(self.window.subwin(self.water_height, self.width, self.sky_height, 0))
         self.beach = Beach(self.window.subwin(self.beach_height, self.width, self.sky_height+self.water_height, 0))
 
-        self.difficulty = difficulty
+        self.difficulty = ['easy', 'medium', 'hard'][difficulty]
         self.obstacles = Obstacles(self.water, self.difficulty)
         self.player = Player(self.water)
         # self.score = 0
@@ -50,6 +50,7 @@ class Game:
 
             except KeyboardInterrupt:
                 break
+        # print score
 
     def draw(self):
         self.window.erase()
